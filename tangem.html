@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lâm Minh ❤️ Mỹ Duyên - Hành Trình Tình Yêu</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Montserrat:wght@400;600;700&family=Pacifico&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <style>
+    :root {
+      --primary: #ff4b72;
+      --primary-light: #ff85a1;
+      --secondary: #fbcfe8;
+      --bg-gradient: linear-gradient(135deg, #fce7f3 0%, #ffd1dc 50%, #fbcfe8 100%);
+      --glass-bg: rgba(255, 255, 255, 0.7);
+      --glass-border: rgba(255, 255, 255, 0.85);
+      --glass-shadow: 0 10px 32px 0 rgba(255, 105, 135, 0.15);
+      --text-dark: #4a1525;
+      --text-muted: #8c4a60;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: var(--bg-gradient);
+      color: var(--text-dark);
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+      padding-bottom: 60px;
+    }
+
+    /* Lock Screen Modal */
+    #lockScreen {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: linear-gradient(135deg, #ff85a1 0%, #ff4b72 100%);
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      text-align: center;
+      padding: 20px;
+      transition: opacity 0.5s ease, visibility 0.5s ease;
+    }
+
+    #lockScreen.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .lock-box {
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      padding: 35px 25px;
+      border-radius: 24px;
+      max-width: 380px;
+      width: 100%;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+    }
+
+    .lock-avatar {
+      font-size: 3.5rem;
+      margin-bottom: 15px;
+      animation: pulse 1.5s infinite;
+    }
+
+    .lock-title {
+      font-family: 'Dancing Script', cursive;
+      font-size: 2.2rem;
+      margin-bottom: 10px;
+    }
+
+    .lock-desc {
+      font-size: 0.9rem;
+      margin-bottom: 20px;
+      opacity: 0.9;
+    }
+
+    .pass-input-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .pass-input {
+      flex: 1;
+      padding: 12px 15px;
+      border-radius: 20px;
+      border: none;
+      outline: none;
+      text-align: center;
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: var(--text-dark);
+    }
+
+    .unlock-btn {
+      background: white;
+      color: var(--primary);
+      border: none;
+      padding: 12px 20px;
+      border-radius: 20px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .unlock-btn:hover { transform: scale(1.05); }
+
+    /* Canvas */
+    #heartCanvas {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .top-controls {
+      position: fixed;
+      top: 15px; right: 15px;
+      z-index: 100;
+      display: flex; gap: 10px;
+    }
+
+    .icon-btn {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(8px);
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s ease;
+      font-size: 1.2rem;
+    }
+
+    .icon-btn:hover { transform: scale(1.1) rotate(10deg); background: rgba(255, 255, 255, 0.9); }
+
+    .hero { text-align: center; margin-top: 40px; margin-bottom: 30px; }
+
+    .couple-names {
+      font-family: 'Dancing Script', cursive;
+      font-size: 3.5rem;
+      color: var(--primary);
+      text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.8);
+      margin-bottom: 10px;
+      display: flex; align-items: center; justify-content: center; gap: 15px; flex-wrap: wrap;
+    }
+
+    .sub-title {
+      font-family: 'Pacifico', cursive;
+      color: var(--text-muted);
+      font-size: 1.3rem;
+    }
+
+    .glass-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: 30px 20px;
+      box-shadow: var(--glass-shadow);
+      margin-bottom: 35px;
+      text-align: center;
+    }
+
+    .timer-title {
+      font-size: 1.1rem; font-weight: 600; color: var(--text-muted); margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1.5px;
+    }
+
+    .timer-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; max-width: 600px; margin: 0 auto;
+    }
+
+    .timer-box {
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 16px;
+      padding: 15px 5px;
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      box-shadow: 0 4px 12px rgba(255, 133, 161, 0.1);
+    }
+
+    .timer-value {
+      font-size: 2.2rem; font-weight: 700; color: var(--primary);
+    }
+
+    .timer-label { font-size: 0.8rem; color: var(--text-muted); margin-top: 5px; font-weight: 600; }
+
+    .anniversary-date {
+      margin-top: 20px; font-size: 0.95rem; color: var(--text-dark); font-weight: 600; background: rgba(255, 255, 255, 0.6); display: inline-block; padding: 8px 18px; border-radius: 20px;
+    }
+
+    .section-heading {
+      text-align: center; font-family: 'Dancing Script', cursive; font-size: 2.5rem; color: var(--primary); margin-bottom: 20px;
+    }
+
+    /* Fixed Letter Envelope Section */
+    .envelope-wrapper { 
+      perspective: 1000px; 
+      cursor: pointer; 
+      max-width: 550px; 
+      margin: 0 auto 15px; 
+      user-select: none;
+    }
+
+    .envelope {
+      background: #fff0f3; 
+      border: 2px solid #ffccd5; 
+      border-radius: 16px; 
+      position: relative; 
+      padding: 30px 20px; 
+      text-align: center; 
+      box-shadow: 0 10px 25px rgba(255, 75, 114, 0.15); 
+      transition: all 0.4s ease;
+    }
+
+    .envelope:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(255, 75, 114, 0.25); }
+
+    .envelope-seal {
+      width: 55px; height: 55px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; font-size: 1.6rem; animation: pulse 1.5s infinite;
+    }
+
+    .letter-content {
+      display: none;
+      text-align: left; 
+      font-family: 'Dancing Script', cursive; 
+      font-size: 1.45rem; 
+      line-height: 1.8; 
+      color: #291b1b;
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 2px dashed #ffb3c1;
+      animation: fadeIn 0.5s ease;
+    }
+
+    .envelope.open .letter-content {
+      display: block;
+    }
+
+    .envelope.open .envelope-seal {
+      animation: none;
+      background: var(--primary-light);
+    }
+
+    /* Games Section */
+    .games-section { margin-bottom: 40px; }
+    
+    .boxes-grid {
+      display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-top: 20px;
+    }
+
+    .gift-box {
+      background: rgba(255, 255, 255, 0.85);
+      border: 2px dashed var(--primary-light);
+      border-radius: 20px;
+      padding: 25px 20px;
+      width: 160px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .gift-box:hover { transform: translateY(-8px) scale(1.05); background: white; border-color: var(--primary); }
+    .gift-icon { font-size: 3rem; margin-bottom: 10px; }
+
+    .catch-game-box {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: 25px;
+      text-align: center;
+      margin-top: 25px;
+    }
+
+    .game-canvas-area {
+      position: relative;
+      height: 220px;
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: 16px;
+      overflow: hidden;
+      margin: 15px 0;
+      border: 1px solid rgba(255, 255, 255, 0.8);
+    }
+
+    .falling-heart {
+      position: absolute;
+      font-size: 2rem;
+      cursor: pointer;
+      user-select: none;
+      animation: pop 0.2s ease;
+    }
+
+    .btn-custom {
+      background: linear-gradient(135deg, #ff4b72 0%, #ff85a1 100%);
+      color: white; border: none; padding: 12px 28px; border-radius: 30px; font-weight: 600; font-size: 1rem; cursor: pointer; box-shadow: 0 6px 20px rgba(255, 75, 114, 0.35); transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 8px;
+    }
+
+    .btn-custom:hover { transform: translateY(-3px) scale(1.03); box-shadow: 0 10px 25px rgba(255, 75, 114, 0.45); }
+
+    /* Modal */
+    .modal {
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(5px); z-index: 1000; align-items: center; justify-content: center; padding: 20px;
+    }
+    .modal.active { display: flex; }
+    .modal-content {
+      background: white; padding: 30px; border-radius: 24px; max-width: 500px; width: 100%; box-shadow: 0 20px 40px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto;
+    }
+    .modal-title { font-size: 1.4rem; color: var(--primary); margin-bottom: 20px; text-align: center; font-weight: 700; }
+    .form-group { margin-bottom: 15px; }
+    .form-group label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 5px; }
+    .form-group input, .form-group textarea { width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 10px; font-family: inherit; font-size: 0.95rem; }
+    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+    .btn-secondary { background: #eee; color: #555; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer; font-weight: 600; }
+
+    @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+    @keyframes pop { 0% { transform: scale(0); } 100% { transform: scale(1); } }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body>
+
+  <!-- Màn Hình Khóa -->
+  <div id="lockScreen">
+    <div class="lock-box">
+      <div class="lock-avatar">🔒❤️</div>
+      <h2 class="lock-title">Trang Web Tình Yêu</h2>
+      <p class="lock-desc">Nhập mật khẩu riêng của Lâm Minh & Mỹ Duyên để mở khóa nhé!</p>
+      <div class="pass-input-group">
+        <input type="password" id="passInput" class="pass-input" placeholder="Mật khẩu..." autofocus>
+        <button class="unlock-btn" id="unlockBtn">Mở</button>
+      </div>
+      <div id="lockError" style="color: #ffe6e6; font-size:0.85rem; display:none;">Mật khẩu chưa đúng rồi nè! (Mật khẩu: 13062012)</div>
+    </div>
+  </div>
+
+  <canvas id="heartCanvas"></canvas>
+
+  <div class="top-controls">
+    <button class="icon-btn" id="musicBtn" title="Bật/Tắt nhạc">🎵</button>
+    <button class="icon-btn" id="settingsBtn" title="Chỉnh sửa thông tin">⚙️</button>
+  </div>
+
+  <div class="container">
+    <header class="hero">
+      <h1 class="couple-names">
+        <span id="displayBoy">Hoàng Lâm Minh</span>
+        <span style="font-size:0.8em; color:var(--primary)">❤️</span>
+        <span id="displayGirl">Mỹ Duyên</span>
+      </h1>
+      <p class="sub-title">Hành Trình Tình Yêu Sweet Story</p>
+    </header>
+
+    <!-- Bộ đếm ngày -->
+    <div class="glass-card">
+      <div class="timer-title">Chúng ta đã bên nhau được</div>
+      <div class="timer-grid">
+        <div class="timer-box"><div class="timer-value" id="days">00</div><div class="timer-label">Ngày</div></div>
+        <div class="timer-box"><div class="timer-value" id="hours">00</div><div class="timer-label">Giờ</div></div>
+        <div class="timer-box"><div class="timer-value" id="minutes">00</div><div class="timer-label">Phút</div></div>
+        <div class="timer-box"><div class="timer-value" id="seconds">00</div><div class="timer-label">Giây</div></div>
+      </div>
+      <div class="anniversary-date" id="displayDate">Mốc kỷ niệm: 27/07/2026</div>
+    </div>
+
+    <!-- Thư tình lãng mạn -->
+    <section class="letter-section">
+      <h2 class="section-heading">Gửi Mỹ Duyên Của Anh ✨</h2>
+      
+      <div class="envelope-wrapper" id="envelopeWrapper">
+        <div class="envelope" id="envelopeBox">
+          <div class="envelope-seal">💌</div>
+          <div style="font-weight: 700; color: var(--primary); font-size: 1.1rem;" id="envelopeHint">
+            ✉️ Bấm vào đây để mở thư tình nhé!
+          </div>
+          
+          <div class="letter-content" id="displayLetter">
+            Chào Mỹ Duyên yêu dấu,<br><br>
+            Từ mốc thời gian đặc biệt 27/7, mỗi ngày trôi qua với anh đều trở nên vô cùng ý nghĩa và tràn ngập niềm vui. Cảm ơn em đã đến bên cạnh, mang theo nụ cười rạng rỡ và sự dịu dàng làm ấm áp cuộc sống của anh.<br><br>
+            Chúc cho tình yêu của Lâm Minh và Mỹ Duyên chúng mình luôn bền chặt, hạnh phúc và cùng nhau tạo thêm thật nhiều kỷ niệm đẹp nhé! ❤️
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align: center; margin-bottom: 30px;">
+        <button class="btn-custom" id="toggleLetterBtn" style="padding: 8px 20px; font-size: 0.9rem;">
+          💌 Mở / Đóng Thư Tình
+        </button>
+      </div>
+    </section>
+
+    <!-- Trò chơi -->
+    <section class="games-section">
+      <h2 class="section-heading">Góc Trò Chơi Tình Yêu 🎮</h2>
+      
+      <div class="glass-card" style="margin-bottom:20px;">
+        <h3 style="color:var(--primary); font-size:1.3rem;">1. Hộp Quà May Mắn 🎁</h3>
+        <p style="font-size:0.9rem; color:var(--text-muted); margin-top:5px;">Mỹ Duyên hãy chọn 1 hộp quà để nhận điều bất ngờ từ Lâm Minh nhé!</p>
+        
+        <div class="boxes-grid">
+          <div class="gift-box" onclick="openGift(1)">
+            <div class="gift-icon">🎁</div>
+            <div style="font-weight:600; color:var(--primary);">Hộp Số 1</div>
+          </div>
+          <div class="gift-box" onclick="openGift(2)">
+            <div class="gift-icon">🎀</div>
+            <div style="font-weight:600; color:var(--primary);">Hộp Số 2</div>
+          </div>
+          <div class="gift-box" onclick="openGift(3)">
+            <div class="gift-icon">💖</div>
+            <div style="font-weight:600; color:var(--primary);">Hộp Số 3</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="catch-game-box">
+        <h3 style="color:var(--primary); font-size:1.3rem;">2. Thử Thách Bắt Trái Tim 💖</h3>
+        <p style="font-size:0.9rem; color:var(--text-muted); margin-top:5px;">Bấm thật nhanh vào các trái tim xuất hiện trong 15 giây!</p>
+        
+        <div style="margin-top:10px; font-weight:700;">
+          Điểm số: <span id="gameScore" style="color:var(--primary); font-size:1.4rem;">0</span> | 
+          Thời gian: <span id="gameTimer" style="color:var(--primary); font-size:1.4rem;">15</span>s
+        </div>
+
+        <div class="game-canvas-area" id="gameArea">
+          <div style="line-height:200px; color:var(--text-muted);" id="gamePlaceholder">Bấm "Bắt Đầu Play" để chơi!</div>
+        </div>
+
+        <button class="btn-custom" id="startGameBtn">Bắt Đầu Play 🚀</button>
+      </div>
+    </section>
+
+    <div style="text-align:center; margin-top:30px;">
+      <button class="btn-custom" id="confettiBtn">Bắn Tim Rực Rỡ ❤️</button>
+    </div>
+  </div>
+
+  <!-- Modal cài đặt -->
+  <div class="modal" id="settingsModal">
+    <div class="modal-content">
+      <h3 class="modal-title">Chỉnh Sửa Thông Tin</h3>
+      <div class="form-group"><label>Tên bạn nam:</label><input type="text" id="inputBoy"></div>
+      <div class="form-group"><label>Tên bạn nữ:</label><input type="text" id="inputGirl"></div>
+      <div class="form-group"><label>Ngày bắt đầu yêu:</label><input type="datetime-local" id="inputDate"></div>
+      <div class="form-group"><label>Mật khẩu mở web:</label><input type="text" id="inputPassword"></div>
+      <div class="form-group"><label>Nội dung thư tình:</label><textarea id="inputLetter" style="height:100px;"></textarea></div>
+      <div class="modal-actions">
+        <button class="btn-secondary" id="closeModal">Hủy</button>
+        <button class="btn-custom" id="saveSettings">Lưu thay đổi</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // App State
+    const DEFAULT_STATE = {
+      boyName: "Hoàng Lâm Minh",
+      girlName: "Mỹ Duyên",
+      startDate: "2026-07-27T00:00",
+      password: "e yêu a",
+      letter: `Chào Mỹ Duyên yêu dấu,\n\nTừ mốc thời gian đặc biệt 27/7, mỗi ngày trôi qua với anh đều trở nên vô cùng ý nghĩa và tràn ngập niềm vui. Cảm ơn em đã đến bên cạnh, mang theo nụ cười rạng rỡ và sự dịu dàng làm ấm áp cuộc sống của anh.\n\nChúc cho tình yêu của Lâm Minh và Mỹ Duyên chúng mình luôn bền chặt, hạnh phúc và cùng nhau tạo thêm thật nhiều kỷ niệm đẹp nhé! ❤️`
+    };
+
+    let appData = JSON.parse(localStorage.getItem('love_app_data_v4')) || DEFAULT_STATE;
+
+    function saveData() {
+      localStorage.setItem('love_app_data_v4', JSON.stringify(appData));
+    }
+
+    // Password Lock Logic
+    const lockScreen = document.getElementById('lockScreen');
+    const passInput = document.getElementById('passInput');
+    const unlockBtn = document.getElementById('unlockBtn');
+    const lockError = document.getElementById('lockError');
+
+    if (!appData.password || appData.password.trim() === "") {
+      lockScreen.classList.add('hidden');
+    }
+
+    function checkPassword() {
+      if (passInput.value === appData.password || passInput.value === "13062012") {
+        lockScreen.classList.add('hidden');
+        triggerHeartBurst();
+      } else {
+        lockError.style.display = 'block';
+      }
+    }
+
+    unlockBtn.addEventListener('click', checkPassword);
+    passInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') checkPassword(); });
+
+    // UI Updates
+    function updateUI() {
+      document.getElementById('displayBoy').textContent = appData.boyName;
+      document.getElementById('displayGirl').textContent = appData.girlName;
+      
+      const dateObj = new Date(appData.startDate);
+      const formattedDate = `${String(dateObj.getDate()).padStart(2, '0')}/${String(dateObj.getMonth() + 1).padStart(2, '0')}/${dateObj.getFullYear()}`;
+      document.getElementById('displayDate').textContent = `Mốc kỷ niệm: ${formattedDate}`;
+      document.getElementById('displayLetter').innerHTML = appData.letter.replace(/\n/g, '<br>');
+    }
+
+    // Timer Logic
+    function updateTimer() {
+      const start = new Date(appData.startDate).getTime();
+      const diff = new Date().getTime() - start;
+
+      if (diff < 0) return;
+
+      document.getElementById('days').textContent = String(Math.floor(diff / (1000 * 60 * 60 * 24))).padStart(2, '0');
+      document.getElementById('hours').textContent = String(Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, '0');
+      document.getElementById('minutes').textContent = String(Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, '0');
+      document.getElementById('seconds').textContent = String(Math.floor((diff % (1000 * 60)) / 1000)).padStart(2, '0');
+    }
+    setInterval(updateTimer, 1000);
+
+    // --- CẢI TIẾN LOGIC MỞ THƯ TÌNH ---
+    const envelopeBox = document.getElementById('envelopeBox');
+    const envelopeHint = document.getElementById('envelopeHint');
+    const toggleLetterBtn = document.getElementById('toggleLetterBtn');
+
+    function toggleLetter() {
+      envelopeBox.classList.toggle('open');
+      if (envelopeBox.classList.contains('open')) {
+        envelopeHint.textContent = "💌 Thư tình dành riêng cho Mỹ Duyên";
+        triggerHeartBurst();
+      } else {
+        envelopeHint.textContent = "✉️ Bấm vào đây để mở thư tình nhé!";
+      }
+    }
+
+    document.getElementById('envelopeWrapper').addEventListener('click', toggleLetter);
+    toggleLetterBtn.addEventListener('click', toggleLetter);
+
+    // Gift Game Logic
+    const giftRewards = [
+      "🎁 Voucher: 1 Buổi đi ăn uống món Mỹ Duyên thích nhất!",
+      "🎀 Voucher: 1 Buổi đi xem phim rạp cùng Lâm Minh!",
+      "💖 Voucher: 1 Cái ôm thật chặt và 1000 nụ hôn ngọt ngào!"
+    ];
+
+    function openGift(boxNum) {
+      const reward = giftRewards[boxNum - 1];
+      triggerHeartBurst();
+      alert(`🎉 CHÚC MỪNG MỸ DUYÊN!\n\nEm đã mở được: ${reward}`);
+    }
+
+    // Catch Heart Game Logic
+    let score = 0;
+    let gameTime = 15;
+    let gameInterval = null;
+    let spawnInterval = null;
+    const gameArea = document.getElementById('gameArea');
+    const gameScoreEl = document.getElementById('gameScore');
+    const gameTimerEl = document.getElementById('gameTimer');
+    const startGameBtn = document.getElementById('startGameBtn');
+
+    startGameBtn.addEventListener('click', () => {
+      score = 0;
+      gameTime = 15;
+      gameScoreEl.textContent = score;
+      gameTimerEl.textContent = gameTime;
+      gameArea.innerHTML = '';
+      startGameBtn.disabled = true;
+
+      spawnInterval = setInterval(spawnHeart, 600);
+      gameInterval = setInterval(() => {
+        gameTime--;
+        gameTimerEl.textContent = gameTime;
+        if (gameTime <= 0) {
+          clearInterval(gameInterval);
+          clearInterval(spawnInterval);
+          gameArea.innerHTML = '<div style="line-height:200px; color:var(--primary); font-weight:700;">Hết giờ rồi! 🎉</div>';
+          startGameBtn.disabled = false;
+          alert(`Game Over! Mỹ Duyên đã bắt được ${score} trái tim tình yêu! ❤️`);
+        }
+      }, 1000);
+    });
+
+    function spawnHeart() {
+      const heart = document.createElement('div');
+      heart.className = 'falling-heart';
+      heart.textContent = ['❤️', '💖', '💕', '🌸'][Math.floor(Math.random() * 4)];
+      heart.style.left = Math.random() * (gameArea.clientWidth - 40) + 'px';
+      heart.style.top = Math.random() * (gameArea.clientHeight - 40) + 'px';
+
+      heart.addEventListener('click', () => {
+        score++;
+        gameScoreEl.textContent = score;
+        heart.remove();
+      });
+
+      gameArea.appendChild(heart);
+      setTimeout(() => { if (heart.parentNode) heart.remove(); }, 1200);
+    }
+
+    // Settings Modal
+    const settingsBtn = document.getElementById('settingsBtn');
+    const settingsModal = document.getElementById('settingsModal');
+    
+    settingsBtn.addEventListener('click', () => {
+      document.getElementById('inputBoy').value = appData.boyName;
+      document.getElementById('inputGirl').value = appData.girlName;
+      document.getElementById('inputDate').value = appData.startDate;
+      document.getElementById('inputPassword').value = appData.password || '';
+      document.getElementById('inputLetter').value = appData.letter;
+      settingsModal.classList.add('active');
+    });
+
+    document.getElementById('closeModal').addEventListener('click', () => settingsModal.classList.remove('active'));
+
+    document.getElementById('saveSettings').addEventListener('click', () => {
+      appData.boyName = document.getElementById('inputBoy').value || DEFAULT_STATE.boyName;
+      appData.girlName = document.getElementById('inputGirl').value || DEFAULT_STATE.girlName;
+      appData.startDate = document.getElementById('inputDate').value || DEFAULT_STATE.startDate;
+      appData.password = document.getElementById('inputPassword').value;
+      appData.letter = document.getElementById('inputLetter').value || DEFAULT_STATE.letter;
+      saveData();
+      updateUI();
+      settingsModal.classList.remove('active');
+    });
+
+    // Confetti
+    function triggerHeartBurst() {
+      if (typeof confetti === 'function') {
+        confetti({ particleCount: 40, spread: 60, origin: { y: 0.7 }, colors: ['#ff4b72', '#ff85a1', '#ffd1dc'] });
+      }
+    }
+    document.getElementById('confettiBtn').addEventListener('click', triggerHeartBurst);
+
+    // Audio Synth
+    let audioCtx = null, isPlaying = false, musicInterval = null;
+    document.getElementById('musicBtn').addEventListener('click', () => {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (isPlaying) {
+        clearInterval(musicInterval); isPlaying = false; document.getElementById('musicBtn').textContent = '🎵';
+      } else {
+        isPlaying = true; document.getElementById('musicBtn').textContent = '🎶';
+        const notes = [261.63, 329.63, 392.00, 493.88, 523.25];
+        let step = 0;
+        musicInterval = setInterval(() => {
+          try {
+            const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
+            osc.frequency.setValueAtTime(notes[step % notes.length], audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.01, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.12, audioCtx.currentTime + 0.3);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 2.5);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.start(); osc.stop(audioCtx.currentTime + 2.5);
+          } catch(e){}
+          step++;
+        }, 800);
+      }
+    });
+
+    // Canvas Hearts
+    const canvas = document.getElementById('heartCanvas');
+    const ctx = canvas.getContext('2d');
+    function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    window.addEventListener('resize', resize); resize();
+
+    class Heart {
+      constructor() { this.reset(); }
+      reset() {
+        this.x = Math.random() * canvas.width; this.y = canvas.height + 20;
+        this.size = Math.random() * 12 + 6; this.speedY = Math.random() * 1 + 0.5;
+        this.opacity = Math.random() * 0.5 + 0.3;
+      }
+      update() { this.y -= this.speedY; if (this.y < -20) this.reset(); }
+      draw() {
+        ctx.save(); ctx.translate(this.x, this.y);
+        ctx.fillStyle = `rgba(255, 133, 161, ${this.opacity})`;
+        ctx.beginPath(); ctx.arc(0, 0, this.size/2, 0, Math.PI*2); ctx.fill();
+        ctx.restore();
+      }
+    }
+    const hearts = Array.from({ length: 20 }, () => new Heart());
+    function anim() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      hearts.forEach(h => { h.update(); h.draw(); });
+      requestAnimationFrame(anim);
+    }
+    anim(); updateUI(); updateTimer();
+  </script>
+</body>
+</html>
